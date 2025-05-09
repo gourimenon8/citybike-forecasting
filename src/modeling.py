@@ -18,7 +18,7 @@ def make_lags(df: pd.DataFrame, n_lags: int = 28
               ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     # X: each station × lag as a feature
     X = pd.concat({
-        f"{col}_lag{lag}": df[col].shift(lag)
+        f"{col}_lag{lag}": df[col].shift(lag).astype("float32")
         for col in df.columns
         for lag in range(1, n_lags + 1)
     }, axis=1)
@@ -100,4 +100,3 @@ def train_top10_lgbm(models_full: Dict[str, lgb.Booster],
         run_id = run.info.run_id
         mlflow.register_model(f"runs:/{run_id}/model", "citibike_best_model")
     return models
-

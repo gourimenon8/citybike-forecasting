@@ -41,16 +41,17 @@ def main():
     tmp = last28.copy()
     tmp.loc[next_day] = np.nan
     lag_dict = {
-        f"{c}_lag{l}": tmp[c].shift(l)
+        f"{c}_lag{l}": tmp[c].shift(l).astype("float32")
         for c in daily.columns for l in range(1, 29)
     }
-    Xp = pd.DataFrame(lag_dict).iloc[[-1]]
+    Xp = pd.DataFrame(lag_dict).iloc[[-1]].astype("float32")
 
     # 5️⃣ Configure MLflow tracking with Basic Auth
-    mlflow_uri = (
-        f"https://{api_key}:@c.app.hopsworks.ai:443"
-        "/hopsworks-api/api/project/1215708/mlflow"
-    )
+    # Security fix: Don't expose API key in URI
+    mlflow_uri = os.getenv("MLFLOW_TRACKING_URI") 
+    if not mlflow_uri: 
+        raise RuntimeError("MLFLOW_TRACKING_URI environment variable not set")
+
     mlflow.set_tracking_uri(mlflow_uri)
     client = MlflowClient()
 
@@ -61,8 +62,11 @@ def main():
 
     # 7️⃣ Predict
     preds = model.predict(Xp)
-    forecast = pd.Series(preds, index=daily.columns, name=next_day.strftime("%Y-%m-%d"))
-    print("\n📈 Forecast for next day:")
+    if preds.shape != (1,):
+        raise ValueError(f"Expected prediction shape (1,), got {preds.shape}")
+    print(next_day)
+    forecast = pd.Series([preds[0]], index=["total_bikes"], name=next_day.strftime("%Y-%m-%d"))
+    print("\n📈 Forecast for next day (total bikes):")
     print(forecast.round(1))
 
     # 8️⃣ Save locally

@@ -15,11 +15,12 @@ from datetime import datetime
 import hopsworks
 
 
+
 def load_months_data(months, base_url="https://s3.amazonaws.com/tripdata"):
     all_dfs = []
     for month in months:
         url = f"{base_url}/{month}-citibike-tripdata.csv.zip"
-        zip_path = f"{month}.zip"
+        zip_path = f"data/{month}.zip"
         print(f"📥 Downloading {month} data from {url}...")
         r = requests.get(url)
         if r.status_code != 200:
@@ -77,7 +78,7 @@ if __name__ == "__main__":
         raise RuntimeError("Please set the HOPSWORKS_API_KEY environment variable")
 
     # 1️⃣ Load raw data
-    months = ["202401", "202402", "202403", "202404"]
+    months = [ "202402" ]
     raw_df = load_months_data(months)
 
     # 2️⃣ Aggregate

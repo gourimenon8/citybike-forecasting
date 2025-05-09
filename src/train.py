@@ -46,10 +46,9 @@ def main():
     y_train, y_test = y.iloc[train_idx], y.iloc[test_idx]
 
     # 6️⃣ Configure MLflow tracking with Basic Auth
-    mlflow_uri = (
-        f"https://{api_key}:@c.app.hopsworks.ai:443"
-        "/hopsworks-api/api/project/1215708/mlflow"
-    )
+    mlflow_uri = os.getenv("MLFLOW_TRACKING_URI") 
+    if not mlflow_uri: 
+        raise RuntimeError("MLFLOW_TRACKING_URI environment variable not set")
     mlflow.set_tracking_uri(mlflow_uri)
 
     # 7️⃣ Baseline model
