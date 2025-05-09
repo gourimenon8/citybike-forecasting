@@ -1,0 +1,8 @@
+hopsworks
+mlflow
+lightgbm
+pandas
+scikit-learn
+streamlit
+requests
+numpy

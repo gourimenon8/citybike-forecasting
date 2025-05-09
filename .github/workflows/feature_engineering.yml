@@ -1,0 +1,14 @@
+name: Feature Engineering
+
+on:
+  schedule:
+    - cron: '0 3 1 * *'
+  workflow_dispatch:
+
+jobs:
+  feature-engineering:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run feature engineering
+        run: python src/data_engineering.py
