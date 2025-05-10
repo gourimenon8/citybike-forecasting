@@ -1,27 +1,32 @@
 name: Model Training
+
 on:
   workflow_dispatch:
   push:
     paths:
       - "src/train.py"
       - "src/modeling.py"
-      - ".github/workflows/train.yml"
 
 jobs:
   model-training:
     runs-on: ubuntu-latest
+    env:
+      HOPSWORKS_API_KEY: ${{ secrets.HOPSWORKS_API_KEY }}
+      MLFLOW_TRACKING_URI: ${{ secrets.MLFLOW_TRACKING_URI }}
+
     steps:
       - uses: actions/checkout@v3
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.11"
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-      - name: Run Model Training
-        env:
-          HOPSWORKS_API_KEY: ${{ secrets.HOPSWORKS_API_KEY }}
-          MLFLOW_TRACKING_URI: ${{ secrets.MLFLOW_TRACKING_URI }}
-        run: python src/train.py
+
+      - name: Train and Track Models
+        run: |
+          python src/train.py

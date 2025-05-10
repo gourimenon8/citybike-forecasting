@@ -1,14 +1,31 @@
 name: Feature Engineering
 
 on:
-  schedule:
-    - cron: '0 3 1 * *'
   workflow_dispatch:
+  push:
+    paths:
+      - "src/data_processing.py"
+      - "data/**"
 
 jobs:
   feature-engineering:
     runs-on: ubuntu-latest
+    env:
+      HOPSWORKS_API_KEY: ${{ secrets.HOPSWORKS_API_KEY }}
+
     steps:
       - uses: actions/checkout@v3
-      - name: Run feature engineering
-        run: python src/data_engineering.py
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Feature Engineering
+        run: |
+          python -c "from src.data_processing import make_lags; import pandas as pd; df = pd.read_csv('data/citibike_timeseries.csv', index_col=0, parse_dates=True); make_lags(df)"
