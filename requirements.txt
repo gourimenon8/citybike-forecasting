@@ -4,3 +4,4 @@ lightgbm
 pandas
 scikit-learn
 streamlit
+confluent-kafka
