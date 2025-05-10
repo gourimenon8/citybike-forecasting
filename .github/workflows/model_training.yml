@@ -1,12 +1,12 @@
-name: Feature Engineering
-description: "Run feature engineering and prepare data for model training"
+name: model-training
 
 on:
   workflow_dispatch:
   push:
     paths:
-      - "src/feature_engineering.py"
-      - "src/data_preparation.py"
+      - "src/data_engineering.py"
+      - "src/train.py"
+      - "src/modeling.py"
 
 jobs:
   feature-engineering:

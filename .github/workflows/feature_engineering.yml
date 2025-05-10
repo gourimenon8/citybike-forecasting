@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - "src/feature_engineering.py"
+      - "src/data_engineering.py"
 
 jobs:
   feature-engineering:
@@ -31,4 +31,4 @@ jobs:
 
       - name: Run Feature Engineering
         run: |
-          python src/feature_engineering.py
+          python src/data_engineering.py
