@@ -1,14 +1,15 @@
-name: Feature Engineering
-description: "Run feature engineering steps"
+name: Model Inference
+description: "Run model inference and track results with MLflow"
 
 on:
   workflow_dispatch:
   push:
     paths:
-      - "src/feature_engineering.py"
+      - "src/train.py"
+      - "src/modeling.py"
 
 jobs:
-  feature-engineering:
+  model-inference:
     runs-on: ubuntu-latest
     env:
       HOPSWORKS_API_KEY: ${{ secrets.HOPSWORKS_API_KEY }}
@@ -29,6 +30,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run Feature Engineering
+      - name: Inference
         run: |
-          python src/feature_engineering.py
+          python src/inference.py
