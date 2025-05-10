@@ -31,5 +31,4 @@ jobs:
 
       - name: Train and Track Models
         run: |
-          python src/train.py
-          python src/infer.py
+          python src/inference.py
