@@ -14,3 +14,6 @@ Thumbs.db
 
 # Hopsworks and other local configs
 .hsfs/
+
+
+.streamlit/secrets.toml
