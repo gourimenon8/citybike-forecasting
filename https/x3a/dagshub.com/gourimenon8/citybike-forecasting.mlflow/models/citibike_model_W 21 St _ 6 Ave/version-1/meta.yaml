@@ -1,0 +1,16 @@
+aliases: []
+creation_timestamp: 1746846119126
+current_stage: None
+description: null
+last_updated_timestamp: 1746846119126
+name: citibike_model_W 21 St _ 6 Ave
+run_id: b257a511c80b4f37a0e407dd9a005c95
+run_link: null
+source: file:C:/gouri/MLops/citibike-forecasting/https/x3a/dagshub.com/gourimenon8/citybike-forecasting.mlflow/0/b257a511c80b4f37a0e407dd9a005c95/artifacts/model_W
+  21 St _ 6 Ave
+status: READY
+status_message: null
+storage_location: file:C:/gouri/MLops/citibike-forecasting/https/x3a/dagshub.com/gourimenon8/citybike-forecasting.mlflow/0/b257a511c80b4f37a0e407dd9a005c95/artifacts/model_W
+  21 St _ 6 Ave
+user_id: null
+version: 1

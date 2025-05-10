@@ -1,0 +1,16 @@
+aliases: []
+creation_timestamp: 1746848472432
+current_stage: None
+description: null
+last_updated_timestamp: 1746848472432
+name: citibike_model_8 Ave _ W 31 St
+run_id: 80123d2c505b4c88b9b329669a2f47d5
+run_link: null
+source: file:C:/gouri/MLops/citibike-forecasting/https/x3a/dagshub.com/gourimenon8/citybike-forecasting.mlflow/0/80123d2c505b4c88b9b329669a2f47d5/artifacts/model_8
+  Ave _ W 31 St
+status: READY
+status_message: null
+storage_location: file:C:/gouri/MLops/citibike-forecasting/https/x3a/dagshub.com/gourimenon8/citybike-forecasting.mlflow/0/80123d2c505b4c88b9b329669a2f47d5/artifacts/model_8
+  Ave _ W 31 St
+user_id: null
+version: 2

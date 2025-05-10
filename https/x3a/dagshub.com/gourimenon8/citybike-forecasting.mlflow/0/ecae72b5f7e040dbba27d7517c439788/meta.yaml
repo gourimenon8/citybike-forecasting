@@ -1,0 +1,15 @@
+artifact_uri: file:C:/gouri/MLops/citibike-forecasting/https/x3a/dagshub.com/gourimenon8/citybike-forecasting.mlflow/0/ecae72b5f7e040dbba27d7517c439788/artifacts
+end_time: 1746867555258
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: ecae72b5f7e040dbba27d7517c439788
+run_name: lgbm_top10_lags
+run_uuid: ecae72b5f7e040dbba27d7517c439788
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1746867384745
+status: 3
+tags: []
+user_id: gourimenon8

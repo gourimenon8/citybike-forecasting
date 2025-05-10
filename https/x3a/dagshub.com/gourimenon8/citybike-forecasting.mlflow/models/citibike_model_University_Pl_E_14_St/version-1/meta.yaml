@@ -1,0 +1,14 @@
+aliases: []
+creation_timestamp: 1746852731079
+current_stage: None
+description: null
+last_updated_timestamp: 1746852731079
+name: citibike_model_University_Pl_E_14_St
+run_id: 33a0f80992fd4bdabc1cb6dcac0b3b0a
+run_link: null
+source: file:C:/gouri/MLops/citibike-forecasting/https/x3a/dagshub.com/gourimenon8/citybike-forecasting.mlflow/0/33a0f80992fd4bdabc1cb6dcac0b3b0a/artifacts/model_University_Pl_E_14_St
+status: READY
+status_message: null
+storage_location: file:C:/gouri/MLops/citibike-forecasting/https/x3a/dagshub.com/gourimenon8/citybike-forecasting.mlflow/0/33a0f80992fd4bdabc1cb6dcac0b3b0a/artifacts/model_University_Pl_E_14_St
+user_id: null
+version: 1

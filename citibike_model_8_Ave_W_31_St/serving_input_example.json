@@ -1,0 +1,30 @@
+{
+  "dataframe_split": {
+    "columns": [
+      "1 Ave & E 68 St_lag1",
+      "8 Ave & W 31 St_lag1",
+      "Broadway & W 25 St_lag20",
+      "1 Ave & E 68 St_lag7",
+      "W 21 St & 6 Ave_lag24",
+      "1 Ave & E 68 St_lag14",
+      "1 Ave & E 68 St_lag3",
+      "8 Ave & W 31 St_lag17",
+      "Broadway & W 25 St_lag3",
+      "1 Ave & E 68 St_lag21"
+    ],
+    "data": [
+      [
+        167.0,
+        187.0,
+        238.0,
+        78.0,
+        327.0,
+        146.0,
+        254.0,
+        310.0,
+        295.0,
+        89.0
+      ]
+    ]
+  }
+}

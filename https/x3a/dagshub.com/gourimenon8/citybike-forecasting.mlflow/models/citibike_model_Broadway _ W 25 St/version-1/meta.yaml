@@ -1,0 +1,16 @@
+aliases: []
+creation_timestamp: 1746846087858
+current_stage: None
+description: null
+last_updated_timestamp: 1746846087858
+name: citibike_model_Broadway _ W 25 St
+run_id: b257a511c80b4f37a0e407dd9a005c95
+run_link: null
+source: file:C:/gouri/MLops/citibike-forecasting/https/x3a/dagshub.com/gourimenon8/citybike-forecasting.mlflow/0/b257a511c80b4f37a0e407dd9a005c95/artifacts/model_Broadway
+  _ W 25 St
+status: READY
+status_message: null
+storage_location: file:C:/gouri/MLops/citibike-forecasting/https/x3a/dagshub.com/gourimenon8/citybike-forecasting.mlflow/0/b257a511c80b4f37a0e407dd9a005c95/artifacts/model_Broadway
+  _ W 25 St
+user_id: null
+version: 1
