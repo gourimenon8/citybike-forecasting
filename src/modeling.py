@@ -75,17 +75,21 @@ def train_top10_lgbm(models_full: Dict[str, lgb.Booster],
                     ) -> Dict[str, lgb.Booster]:
     """
     Train LightGBM using top-10 features by importance from models_full.
-    Registers the best model in MLflow Model Registry.
+    Registers one model per station in MLflow Model Registry.
     """
     import pandas as pd
-    # derive top10 from first station model
+    mlflow_client = MlflowClient()
+
+    # Derive top 10 features from first station model
     first = list(models_full.keys())[0]
     imp = pd.Series(models_full[first].feature_importance(), index=X_train.columns)
     top10 = imp.nlargest(10).index.tolist()
     models = {}
+
     with mlflow.start_run(run_name="lgbm_top10_lags") as run:
         mlflow.log_param("model_type", "lightgbm_top10")
         mlflow.log_param("n_features", len(top10))
+
         for st in y_train.columns:
             dtrain = lgb.Dataset(X_train[top10], label=y_train[st])
             model = lgb.train({"objective": "regression", "metric": "mae"}, dtrain, num_rounds)
@@ -93,10 +97,18 @@ def train_top10_lgbm(models_full: Dict[str, lgb.Booster],
             mae = mean_absolute_error(y_test[st], preds)
             mlflow.log_metric(f"mae_{clean_fn(st)}", mae)
             models[st] = model
-        # log & register first station model
-        sig = infer_signature(X_train[top10], y_train[y_train.columns[0]])
-        mlflow.sklearn.log_model(models[y_train.columns[0]], "model",
-                                 input_example=X_train[top10].iloc[:1], signature=sig)
-        run_id = run.info.run_id
-        mlflow.register_model(f"runs:/{run_id}/model", "citibike_best_model")
+
+            # Log model
+            sig = infer_signature(X_train[top10], y_train[st])
+            model_name = f"citibike_model_{clean_fn(st)}"
+            artifact_path = f"model_{clean_fn(st)}"
+            mlflow.sklearn.log_model(model, artifact_path=artifact_path,
+                                     input_example=X_train[top10].iloc[:1], signature=sig)
+
+            # Register to model registry
+            model_uri = f"runs:/{run.info.run_id}/{artifact_path}"
+            mlflow.register_model(model_uri, model_name)
+            print(f"✅ Registered model: {model_name}")
+
     return models
+
