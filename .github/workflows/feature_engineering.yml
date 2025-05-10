@@ -28,4 +28,4 @@ jobs:
 
       - name: Run Feature Engineering
         run: |
-          python -c "from src.data_processing import make_lags; import pandas as pd; df = pd.read_csv('data/citibike_timeseries.csv', index_col=0, parse_dates=True); make_lags(df)"
+          python -c src/data_processing.py
