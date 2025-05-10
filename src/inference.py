@@ -4,14 +4,14 @@
 Load best model from Hopsworks Model Registry via MLflow and predict next‑day rides.
 """
 
+# src/inference.py
+
 import os
-import sys
 import pandas as pd
 import numpy as np
 import hopsworks
 import mlflow
 from datetime import timedelta
-from mlflow.tracking import MlflowClient
 
 def main():
     # 1️⃣ Load Hopsworks API key
@@ -25,11 +25,10 @@ def main():
     fg = fs.get_feature_group("citibike_daily_rides", version=1)
     df = fg.read()
 
-    # 3️⃣ Pivot + last 28 days
+    # 3️⃣ Pivot data and select last 28 days
     daily = (
-        df
-        .pivot(index="date", columns="start_station_name", values="ride_count")
-        .fillna(0)
+        df.pivot(index="date", columns="start_station_name", values="ride_count")
+          .fillna(0)
     )
     daily.index = pd.to_datetime(daily.index)
     last28 = daily.tail(28)
@@ -46,27 +45,33 @@ def main():
     }
     Xp = pd.DataFrame(lag_dict).iloc[[-1]].astype("float32")
 
-    # 5️⃣ Configure MLflow tracking with Basic Auth
-    # Security fix: Don't expose API key in URI
-    mlflow_uri = os.getenv("MLFLOW_TRACKING_URI") 
-    if not mlflow_uri: 
+    # 5️⃣ Configure MLflow tracking
+    mlflow_uri = os.getenv("MLFLOW_TRACKING_URI")
+    if not mlflow_uri:
         raise RuntimeError("MLFLOW_TRACKING_URI environment variable not set")
-
     mlflow.set_tracking_uri(mlflow_uri)
-    client = MlflowClient()
 
-    # 6️⃣ Load the latest top‑10 model from the Model Registry
-    #    (Assumes you registered under name "citibike_best_model")
-    model_uri = f"models:/citibike_best_model/1"
-    model = mlflow.pyfunc.load_model(model_uri)
+    # 6️⃣ Inference per station
+    forecast_values = {}
 
-    # 7️⃣ Predict
-    preds = model.predict(Xp)
-    if preds.shape != (1,):
-        raise ValueError(f"Expected prediction shape (1,), got {preds.shape}")
-    print(next_day)
-    forecast = pd.Series([preds[0]], index=["total_bikes"], name=next_day.strftime("%Y-%m-%d"))
-    print("\n📈 Forecast for next day (total bikes):")
+    # Extract base station names from feature columns
+    station_names = Xp.columns.str.extract(r"(.+)_lag\d+")[0].unique()
+
+    for station in station_names:
+        model_name = f"citibike_model_{station.replace(' ', '_').replace('&', 'and')}"
+        try:
+            model = mlflow.pyfunc.load_model(f"models:/{model_name}/1")
+            station_lags = [col for col in Xp.columns if col.startswith(f"{station}_lag")]
+            pred = model.predict(Xp[station_lags])[0]
+            forecast_values[station] = pred
+            print(f"✅ Predicted {pred:.1f} rides for '{station}'")
+        except Exception as e:
+            forecast_values[station] = None
+            print(f"⚠️ Could not load model or predict for station '{station}': {e}")
+
+    # 7️⃣ Print forecast
+    forecast = pd.Series(forecast_values, name=next_day.strftime("%Y-%m-%d"))
+    print("\n📈 Forecast for next day:")
     print(forecast.round(1))
 
     # 8️⃣ Save locally
