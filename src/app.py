@@ -1,51 +1,73 @@
+# src/app.py
 import os
 import streamlit as st
 import pandas as pd
+import numpy as np
+import mlflow
+from datetime import timedelta
+
+# —————————————————————————————————————————————
+# 1) disable Hopsworks “model serving” client so that hopsworks.login()
+#    won’t try to initialize kServe, which fails outside their cloud
+os.environ["HOPSWORKS_DISABLE_SERVING"] = "true"
+
 import hopsworks
-import joblib
-import json
 
-from utils import clean_model_name, make_lags
-from datetime import datetime
+# —————————————————————————————————————————————
+st.title("Citi Bike Ride Forecasting")
 
-st.set_page_config(page_title="Citi Bike Forecast", page_icon="🚲")
-st.title("🚲 Citi Bike Forecast")
-
-# ✅ Read API key
-api_key = os.environ.get("HOPSWORKS_API_KEY")
-if not api_key:
-    st.error("HOPSWORKS_API_KEY not set.")
-    st.stop()
-
-# ✅ Connect to Hopsworks
-project = hopsworks.login(api_key_value=api_key, project="gourimenon8")
+# 2) Log in & fetch your feature group
+st.info("🔌 Connecting to Hopsworks…")
+project = hopsworks.login(api_key_value=st.secrets["HOPSWORKS_API_KEY"])
 fs = project.get_feature_store()
-
-# ✅ Read feature data
-fg = fs.get_feature_group(name="citibike_aggregates", version=1)
+fg = fs.get_feature_group("citibike_daily_rides", version=1)
 df = fg.read()
+st.success("✅ Feature data loaded")
 
-# ✅ Lag features
-pivot = df.pivot(index="date", columns="station_name", values="rides")
-X_all, _ = make_lags(pivot, n_lags=28)
-X_pred = X_all.tail(1)
+# 3) pivot into wide form & take last 28 days
+daily = (
+    df
+    .pivot(index="date", columns="start_station_name", values="ride_count")
+    .fillna(0)
+)
+daily.index = pd.to_datetime(daily.index)
+last28 = daily.tail(28)
 
-model_registry = project.get_model_registry()
-stations = list(pivot.columns)
+# 4) build tomorrow’s lag features
+next_day = last28.index[-1] + timedelta(days=1)
+tmp = last28.copy()
+tmp.loc[next_day] = np.nan
+# each column → 28 lag columns
+Xp = pd.concat(
+    {
+        f"{station}_lag{lag}": tmp[station].shift(lag).astype("float32")
+        for station in daily.columns
+        for lag in range(1, 29)
+    },
+    axis=1,
+).iloc[[-1]].astype("float32")
 
-for station in stations:
-    cleaned = clean_model_name(station)
-    st.subheader(f"📍 {station}")
+# 5) loop through each station's model
+st.info("⏳ Loading models & generating predictions…")
+results = []
+for station in daily.columns:
+    clean = station.replace(" ", "_").replace("&", "").replace("/", "_")
+    model_name = f"citibike_model_{clean}"
+    st.write(f"🔍 Loading model `{model_name}`")
     try:
-        model = model_registry.get_model(f"citibike_model_{cleaned}", version=1)
-        dir = model.download()
-        
-        with open(os.path.join(dir, "top10_features.json")) as f:
-            top10 = json.load(f)
-
-        lgb_model = joblib.load(os.path.join(dir, "model.pkl"))
-        pred = lgb_model.predict(X_pred[top10])[0]
-
-        st.metric("Predicted Rides Tomorrow", f"{int(pred)}")
+        # get latest registered version
+        client = mlflow.tracking.MlflowClient()
+        versions = client.get_latest_versions(model_name)
+        uri = versions[0].source  # e.g. "models:/citibike_model_X/3"
+        model = mlflow.pyfunc.load_model(uri)
+        pred = model.predict(Xp)[0]
+        results.append({"station": station, "prediction": round(pred)})
+        st.success(f"📈 {station}: {pred:.0f} rides tomorrow")
     except Exception as e:
-        st.error(f"❌ Could not load model for {station}: {e}")
+        st.error(f"⚠️ {station}: could not load/predict ({e})")
+
+if results:
+    st.subheader("Summary Table")
+    st.table(pd.DataFrame(results).set_index("station"))
+else:
+    st.error("❌ No predictions could be made.")
