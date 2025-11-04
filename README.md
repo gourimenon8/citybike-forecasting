@@ -4,8 +4,6 @@
 End-to-end time-series pipeline for forecasting NYC Citi Bike hourly ride counts by station/region.
 Includes data ingestion → feature engineering → model training/evaluation → batch inference → a Streamlit dashboard.
 
-<p align="center"> <img src="assets/citibike_banner.png" alt="Citi Bike Forecasting" width="800"> </p>
-
 # Highlights
 Data: pulls official Citi Bike trip data from https://citibikenyc.com/system-data
 Features: rich lag features (1, 24, 48, …, 672) + rolling means, trend, DoW/holiday, weather (optional)
@@ -119,16 +117,16 @@ MLFLOW_TRACKING_URI=
 MLFLOW_EXPERIMENT_NAME=citybike-forecasting
 
 # Useful Commands
-# Rebuild features quickly for a shorter slice
+ Rebuild features quickly for a shorter slice
 python -m src.transform --start 2023-01-01 --end 2023-02-28 --freq H
 
-# Train only for one location
+ Train only for one location
 python -m src.train --locations 43
 
-# Predict one month only
+ Predict one month only
 python -m src.predict --year 2024 --month 01 --locations 43
 
-# Export metrics table
+ Export metrics table
 python -m src.train --export-metrics metrics/metrics.csv
 
 
