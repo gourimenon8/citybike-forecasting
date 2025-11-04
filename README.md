@@ -6,7 +6,7 @@ Includes data ingestion → feature engineering → model training/evaluation �
 
 <p align="center"> <img src="assets/citibike_banner.png" alt="Citi Bike Forecasting" width="800"> </p>
 
-✨ Highlights
+ Highlights
 
 Data: pulls official Citi Bike trip data from https://citibikenyc.com/system-data
 
@@ -23,7 +23,7 @@ Streamlit app: interactive exploration + MAE/MAPE by location with caching
 Optional: MLflow experiment tracking, GitHub Actions for scheduled runs
 
 
-🧱 1. Project Structure
+ 1. Project Structure
 
 cciti-bike-forecasting/
 ├── app/                     # Streamlit app (app.py + components)
@@ -47,43 +47,7 @@ cciti-bike-forecasting/
 
 
 
-🧱 Architecture (at a glance)
-            ┌──────────────────────┐
-            │  System Data (CSV/ZIP│
-            │  https://citibike... │
-            └─────────┬────────────┘
-                      │  ingest.py
-               raw/   ▼
-            ┌──────────────────────┐
-            │  Bronze: raw files   │
-            └─────────┬────────────┘
-                      │  transform.py
-           features/  ▼
-            ┌──────────────────────┐
-            │ Silver: cleaned +    │
-            │ engineered features   │
-            └─────────┬────────────┘
-                      │  train.py
-             models/  ▼
-            ┌──────────────────────┐
-            │  LightGBM models     │
-            │  + metrics           │
-            └─────────┬────────────┘
-                      │  predict.py
-       predictions/   ▼
-            ┌──────────────────────┐
-            │  Batch forecasts     │
-            │  (year/month/day/hr) │
-            └─────────┬────────────┘
-                      │  app.py
-                      ▼
-            ┌──────────────────────┐
-            │  Streamlit dashboard │
-            └──────────────────────┘
-
-
-
-🔧 Setup
+ Setup
 
 Prereqs: Python 3.10+, Git, (optional) make
 # clone your repo
@@ -100,7 +64,7 @@ source .venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env
 
-🗂️ Data
+ Data
 
 Primary source: Citi Bike System Data → https://citibikenyc.com/system-data
 
@@ -109,7 +73,7 @@ Typical files: monthly trip CSVs (YYYYMM-citibike-tripdata.csv.zip)
 Optional: weather (NOAA/Open-Meteo). If you don’t have an API key, keep weather disabled.
 
 
-🚀 Quickstart (Local)
+ Quickstart (Local)
 1) Ingest data
 
 Downloads the months you specify and stores them under data/raw/.
@@ -140,7 +104,7 @@ python -m src.predict --year 2024 --locations 43 79 162 --model lgbm_28lag
 Two tabs: Features/Predictions and Metrics, with caching.
 streamlit run app/app.py
 
-📊 Evaluation
+ Evaluation
 
 MAE (Mean Absolute Error)
 
@@ -155,7 +119,7 @@ location_id, model, split, MAE, RMSE, MAPE
 ...
 The Streamlit app displays per-location metrics and side-by-side comparisons of the two LightGBM variants.
 
-⚙️ Configuration
+ Configuration
 src/config.py (or .env) controls defaults:
 # .env.example
 DATA_DIR=data
@@ -172,7 +136,7 @@ WITH_WEATHER=false
 MLFLOW_TRACKING_URI=
 MLFLOW_EXPERIMENT_NAME=citibike-forecasting
 
-🧪 Useful Commands
+ Useful Commands
 # Rebuild features quickly for a shorter slice
 python -m src.transform --start 2023-01-01 --end 2023-02-28 --freq H
 
@@ -185,7 +149,7 @@ python -m src.predict --year 2024 --month 01 --locations 43
 # Export metrics table
 python -m src.train --export-metrics metrics/metrics.csv
 
-🧰 MLflow (Optional)
+ MLflow (Optional)
 Enable experiment tracking:
 # .env
 MLFLOW_TRACKING_URI=http://127.0.0.1:5000
@@ -197,7 +161,7 @@ mlflow ui
 python -m src.train --mlflow true
 You’ll see runs with MAE reductions vs baseline, plus params & artifacts.
 
-⏰ Scheduling (Optional, GitHub Actions)
+ Scheduling (Optional, GitHub Actions)
 
 Create .github/workflows/pipeline.yml:
 name: citibike-forecasting
@@ -227,7 +191,7 @@ jobs:
           git commit -m "chore: update predictions" || true
           git push || true
 
-🧱 Implementation Notes
+ Implementation Notes
 
 Aggregation level: hourly counts per start_station_id (or a chosen mapping to “location”).
 
@@ -245,7 +209,7 @@ Calendar: hour, dayofweek, weekend, holiday flag
 
 (optional) weather: temp, precip, wind
 
-🧹 Troubleshooting
+ Troubleshooting
 
 Slow training: reduce locations (--locations 43) or limit months in ingest.
 
